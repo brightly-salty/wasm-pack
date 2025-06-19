@@ -12,6 +12,7 @@ use std::process::Command;
 /// Run the `wasm-bindgen` CLI to generate bindings for the current crate's
 /// `.wasm`.
 pub fn wasm_bindgen_build(
+    wasm_path: &str,
     data: &CrateData,
     install_status: &install::Status,
     out_dir: &Path,
@@ -21,30 +22,8 @@ pub fn wasm_bindgen_build(
     reference_types: bool,
     target: Target,
     profile: BuildProfile,
-    extra_options: &Vec<String>,
 ) -> Result<()> {
-    let profile_name = match profile.clone() {
-        BuildProfile::Release | BuildProfile::Profiling => "release",
-        BuildProfile::Dev => "debug",
-        BuildProfile::Custom(profile_name) => &profile_name.clone(),
-    };
-
     let out_dir = out_dir.to_str().unwrap();
-
-    let target_directory = {
-        let mut has_target_dir_iter = extra_options.iter();
-        has_target_dir_iter
-            .find(|&it| it == "--target-dir")
-            .and_then(|_| has_target_dir_iter.next())
-            .map(Path::new)
-            .unwrap_or(data.target_directory())
-    };
-
-    let wasm_path = target_directory
-        .join("wasm32-unknown-unknown")
-        .join(profile_name)
-        .join(data.crate_name())
-        .with_extension("wasm");
 
     let dts_arg = if disable_dts {
         "--no-typescript"

@@ -6,8 +6,10 @@ use crate::emoji;
 use crate::manifest::Crate;
 use crate::PBAR;
 use anyhow::{anyhow, bail, Context, Result};
+use cargo_metadata::{parse_messages, Artifact, Message};
+use std::io::BufReader;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::str;
 
 pub mod wasm_target;
@@ -72,12 +74,12 @@ fn wasm_pack_local_version() -> Option<String> {
     Some(output.to_string())
 }
 
-/// Run `cargo build` targetting `wasm32-unknown-unknown`.
+/// Run `cargo build` for Wasm with config derived from the given `BuildProfile`.
 pub fn cargo_build_wasm(
     path: &Path,
     profile: BuildProfile,
     extra_options: &[String],
-) -> Result<()> {
+) -> Result<String> {
     let msg = format!("{}Compiling to Wasm...", emoji::CYCLONE);
     PBAR.info(&msg);
 
@@ -109,7 +111,9 @@ pub fn cargo_build_wasm(
         }
     }
 
-    cmd.arg("--target").arg("wasm32-unknown-unknown");
+    // If user has specified a custom --target in Cargo options, we shouldn't override it.
+    // Otherwise, default to wasm32-unknown-unknown.
+    cmd.env("CARGO_BUILD_TARGET", "wasm32-unknown-unknown");
 
     // The `cargo` command is executed inside the directory at `path`, so relative paths set via extra options won't work.
     // To remedy the situation, all detected paths are converted to absolute paths.
@@ -132,8 +136,42 @@ pub fn cargo_build_wasm(
         .collect::<Result<Vec<_>>>()?;
     cmd.args(extra_options_with_absolute_paths);
 
-    child::run(cmd, "cargo build").context("Compiling your crate to WebAssembly failed")?;
-    Ok(())
+    cmd.arg("--message-format=json");
+
+    let mut cargo_process = cmd.stdout(Stdio::piped()).spawn()?;
+
+    let final_artifact =
+        Message::parse_stream(BufReader::new(cargo_process.stdout.as_mut().unwrap()))
+            .filter_map(|msg| {
+                match msg {
+                    Ok(Message::CompilerArtifact(artifact)) => return Some(artifact),
+                    Ok(Message::CompilerMessage(msg)) => eprintln!("{msg}"),
+                    Ok(Message::TextLine(text)) => eprintln!("{text}"),
+                    Err(err) => eprintln!("Couldn't parse cargo message: {err}"),
+                    _ => {} // ignore messages irrelevant to the user
+                }
+                None
+            })
+            .last();
+
+    if !cargo_process
+        .wait()
+        .context("Failed to wait for cargo build process")?
+        .success()
+    {
+        bail!("`cargo build` failed, see the output above for details");
+    }
+
+    match <[_; 1]>::try_from(
+        final_artifact
+            .context("Expected at least one compiler artifact in the output of `cargo build`")?
+            .filenames,
+    ) {
+        Ok([filename]) => Ok(filename.into_string()),
+        Err(filenames) => {
+            bail!("Expected exactly one filename in the compiler artifact, but found {filenames:?}")
+        }
+    }
 }
 
 /// Runs `cargo build --tests` targeting `wasm32-unknown-unknown`.
@@ -162,7 +200,7 @@ pub fn cargo_build_wasm_tests(path: &Path, debug: bool, extra_options: &[String]
         cmd.arg("--release");
     }
 
-    cmd.arg("--target").arg("wasm32-unknown-unknown");
+    cmd.env("CARGO_BUILD_TARGET", "wasm32-unknown-unknown");
 
     cmd.args(extra_options);
 
