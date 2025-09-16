@@ -6,7 +6,7 @@ use crate::emoji;
 use crate::manifest::Crate;
 use crate::PBAR;
 use anyhow::{anyhow, bail, Context, Result};
-use cargo_metadata::{parse_messages, Artifact, Message};
+use cargo_metadata::Message;
 use std::io::BufReader;
 use std::path::Path;
 use std::process::{Command, Stdio};
@@ -147,7 +147,7 @@ pub fn cargo_build_wasm(
                     Ok(Message::CompilerArtifact(artifact)) => return Some(artifact),
                     Ok(Message::CompilerMessage(msg)) => eprintln!("{msg}"),
                     Ok(Message::TextLine(text)) => eprintln!("{text}"),
-                    Err(err) => eprintln!("Couldn't parse cargo message: {err}"),
+                    Err(err) => log::error!("Couldn't parse cargo message: {err}"),
                     _ => {} // ignore messages irrelevant to the user
                 }
                 None
