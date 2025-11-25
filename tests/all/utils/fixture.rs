@@ -144,7 +144,7 @@ impl Fixture {
                     # bindgen downloaded is what we expect, and if `=` is
                     # removed then it will download whatever the newest version
                     # of wasm-bindgen is which may not be what's listed here.
-                    wasm-bindgen = "=0.2.95"
+                    wasm-bindgen = "=0.2.100"
 
                     [dev-dependencies]
                     wasm-bindgen-test = "0.3"
@@ -182,7 +182,7 @@ impl Fixture {
                     # bindgen downloaded is what we expect, and if `=` is
                     # removed then it will download whatever the newest version
                     # of wasm-bindgen is which may not be what's listed here.
-                    wasm-bindgen = "=0.2.95"
+                    wasm-bindgen = "=0.2.100"
 
                     [dev-dependencies]
                     wasm-bindgen-test = "0.3"
@@ -220,7 +220,7 @@ impl Fixture {
                     crate-type = ["cdylib"]
 
                     [dependencies]
-                    wasm-bindgen = "=0.2.21"
+                    wasm-bindgen = "=0.2.100"
 
                     [dev-dependencies]
                     wasm-bindgen-test = "=0.2.21"
