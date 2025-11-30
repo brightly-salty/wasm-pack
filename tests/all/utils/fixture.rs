@@ -390,8 +390,10 @@ impl Fixture {
     /// Get a `wasm-pack` command configured to run in this fixure's temp
     /// directory and using the test cache.
     pub fn wasm_pack(&self) -> Command {
-        use assert_cmd::prelude::*;
-        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
+        use assert_cmd::cargo;
+
+        let mut cmd = Command::new(cargo::cargo_bin!(env!("CARGO_PKG_NAME")));
+
         cmd.current_dir(&self.path);
         cmd.env("WASM_PACK_CACHE", self.cache_dir());
 
