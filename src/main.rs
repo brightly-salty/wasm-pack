@@ -101,17 +101,14 @@ fn run() -> Result<()> {
 }
 
 fn setup_panic_hooks() {
-    let meta = human_panic::Metadata {
-        version: env!("CARGO_PKG_VERSION").into(),
-        name: env!("CARGO_PKG_NAME").into(),
-        authors: env!("CARGO_PKG_AUTHORS").replace(":", ", ").into(),
-        homepage: env!("CARGO_PKG_HOMEPAGE").into(),
-    };
+    let meta = human_panic::Metadata::new(env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+        .authors(env!("CARGO_PKG_AUTHORS").replace(":", ", "))
+        .homepage(env!("CARGO_PKG_HOMEPAGE"));
 
     let default_hook = panic::take_hook();
 
     if let Err(_) = env::var("RUST_BACKTRACE") {
-        panic::set_hook(Box::new(move |info: &panic::PanicInfo| {
+        panic::set_hook(Box::new(move |info| {
             // First call the default hook that prints to standard error.
             default_hook(info);
 
