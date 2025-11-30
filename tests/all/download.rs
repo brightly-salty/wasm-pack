@@ -10,7 +10,7 @@ fn can_download_prebuilt_wasm_bindgen() {
     let dir = tempfile::TempDir::new().unwrap();
     let cache = binary_install::Cache::at(dir.path());
     if let install::Status::Found(dl) =
-        install::download_prebuilt(&Tool::WasmBindgen, &cache, "0.2.95", true).unwrap()
+        install::download_prebuilt(&Tool::WasmBindgen, &cache, "0.2.100", true).unwrap()
     {
         assert!(dl.binary("wasm-bindgen").unwrap().is_file());
         assert!(dl.binary("wasm-bindgen-test-runner").unwrap().is_file())
