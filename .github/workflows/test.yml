@@ -1,5 +1,4 @@
 name: Tests
-
 on:
   push:
     branches:
@@ -7,11 +6,9 @@ on:
   pull_request:
     branches:
       - master
-
 jobs:
   test:
     name: Test
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,7 +23,6 @@ jobs:
           - build: windows-stable
             os: windows-latest
             rust: stable
-
     steps:
       - uses: actions/checkout@v3
       - uses: nanasess/setup-chromedriver@master
@@ -37,7 +33,6 @@ jobs:
           toolchain: ${{ matrix.rust }}
           targets: wasm32-unknown-unknown
       - uses: actions/setup-node@v2
-
       - name: Cache dependencies
         uses: actions/cache@v3
         env:
@@ -51,14 +46,17 @@ jobs:
             ~/.cargo/registry/cache
             target
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
-
+      # Pre-install wasm-bindgen-cli on macOS to avoid race condition
+      - name: Pre-install wasm-bindgen-cli (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir -p target/test_cache/.wasm-bindgen-cargo-install-0.2.100
+          cargo install wasm-bindgen-cli --version 0.2.100 --root target/test_cache/.wasm-bindgen-cargo-install-0.2.100 --force
       - name: Run Tests
         run: cargo test --all --locked
         env:
           RUST_BACKTRACE: 1
-
       - name: Clippy
         run: cargo clippy
-
       - name: Cargo fmt
         run: cargo fmt --all -- --check

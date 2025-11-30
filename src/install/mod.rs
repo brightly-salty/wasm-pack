@@ -176,6 +176,7 @@ pub fn prebuilt_url_for(tool: &Tool, version: &str, arch: &Arch, os: &Os) -> Res
         (Os::Linux, Arch::AArch64, Tool::WasmOpt) => "aarch64-linux",
         (Os::Linux, Arch::AArch64, _) => "aarch64-unknown-linux-gnu",
         (Os::Linux, Arch::X86_64, Tool::WasmOpt) => "x86_64-linux",
+        (Os::Linux, Arch::X86_64, Tool::CargoGenerate) => "x86_64-unknown-linux-gnu",
         (Os::Linux, Arch::X86_64, _) => "x86_64-unknown-linux-musl",
         (Os::MacOS, Arch::X86_64, Tool::WasmOpt) => "x86_64-macos",
         (Os::MacOS, Arch::X86_64, _) => "x86_64-apple-darwin",
@@ -196,7 +197,7 @@ pub fn prebuilt_url_for(tool: &Tool, version: &str, arch: &Arch, os: &Os) -> Res
         Tool::CargoGenerate => {
             Ok(format!(
                 "https://github.com/cargo-generate/cargo-generate/releases/download/v{0}/cargo-generate-v{0}-{1}.tar.gz",
-                "0.18.2",
+                "0.23.7",
                 target
             ))
         },
