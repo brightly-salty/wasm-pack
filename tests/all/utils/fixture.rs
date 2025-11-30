@@ -265,7 +265,7 @@ impl Fixture {
 
         static INSTALL_WASM_BINDGEN: Once = Once::new();
         let cache = self.cache();
-        let version = "0.2.95";
+        let version = "0.2.100";
 
         let download = || {
             if let Ok(download) =
