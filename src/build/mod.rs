@@ -162,14 +162,19 @@ pub fn cargo_build_wasm(
         bail!("`cargo build` failed, see the output above for details");
     }
 
-    match <[_; 1]>::try_from(
-        final_artifact
-            .context("Expected at least one compiler artifact in the output of `cargo build`")?
-            .filenames,
-    ) {
+    let wasm_files: Vec<_> = final_artifact
+        .context("Expected at least one compiler artifact in the output of `cargo build`")?
+        .filenames
+        .into_iter()
+        .filter(|path| path.extension() == Some("wasm"))
+        .collect();
+
+    match <[_; 1]>::try_from(wasm_files) {
         Ok([filename]) => Ok(filename.into_string()),
         Err(filenames) => {
-            bail!("Expected exactly one filename in the compiler artifact, but found {filenames:?}")
+            bail!(
+                "Expected exactly one .wasm file in the compiler artifact, but found {filenames:?}"
+            )
         }
     }
 }

@@ -116,7 +116,7 @@ fn does_target_libdir_exist(target: &str) -> bool {
     }
 }
 
-fn check_target(target: &str) -> Result<Wasm32Check> {
+fn check_target(target: &'_ str) -> Result<Wasm32Check<'_>> {
     let sysroot = get_rustc_sysroot()?;
     let rustc_path = which::which("rustc")?;
 
