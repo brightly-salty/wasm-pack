@@ -3,7 +3,6 @@
 //! This module helps us ensure that all child processes that we spawn get
 //! properly logged and their output is logged as well.
 
-use crate::install::Tool;
 use anyhow::{bail, Result};
 use log::info;
 use std::process::{Command, Stdio};
@@ -43,7 +42,10 @@ pub fn run(mut command: Command, command_name: &str) -> Result<()> {
 }
 
 /// Run the given command and return its stdout.
-pub fn run_capture_stdout(mut command: Command, command_name: &Tool) -> Result<String> {
+pub fn run_capture_stdout(
+    mut command: Command,
+    command_name: impl std::fmt::Display,
+) -> Result<String> {
     info!("Running {:?}", command);
 
     let output = command

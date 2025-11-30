@@ -41,6 +41,8 @@ pub struct Build {
     pub bindgen: Option<install::Status>,
     pub cache: Cache,
     pub extra_options: Vec<String>,
+    target_triple: String,
+    wasm_path: Option<String>,
 }
 
 /// What sort of output we're going to be generating and flags we're invoking
@@ -243,6 +245,21 @@ impl Build {
             _ => bail!("Can only supply one of the --dev, --release, --profiling, or --profile 'name' flags"),
         };
 
+        let extra_options = build_opts.extra_options;
+
+        let target_triple = {
+            let mut extra_options_iter = extra_options.iter();
+            if extra_options_iter
+                .by_ref()
+                .any(|option| option == "--target")
+            {
+                extra_options_iter.next().map(|s| s.as_str())
+            } else {
+                None
+            }
+            .unwrap_or("wasm32-unknown-unknown")
+        };
+
         Ok(Build {
             crate_path,
             crate_data,
@@ -259,7 +276,9 @@ impl Build {
             out_name: build_opts.out_name,
             bindgen: None,
             cache: cache::get_wasm_pack_cache()?,
-            extra_options: build_opts.extra_options,
+            target_triple: target_triple.to_owned(),
+            extra_options,
+            wasm_path: None,
         })
     }
 
@@ -361,23 +380,17 @@ impl Build {
 
     fn step_check_for_wasm_target(&mut self) -> Result<()> {
         info!("Checking for wasm-target...");
-        build::wasm_target::check_for_wasm32_target()?;
+        build::wasm_target::check_for_wasm_target(&self.target_triple)?;
         info!("Checking for wasm-target was successful.");
         Ok(())
     }
 
     fn step_build_wasm(&mut self) -> Result<()> {
         info!("Building wasm...");
-        build::cargo_build_wasm(&self.crate_path, self.profile.clone(), &self.extra_options)?;
-
-        info!(
-            "wasm built at {:#?}.",
-            &self
-                .crate_path
-                .join("target")
-                .join("wasm32-unknown-unknown")
-                .join("release")
-        );
+        let wasm_path =
+            build::cargo_build_wasm(&self.crate_path, self.profile.clone(), &self.extra_options)?;
+        info!("wasm built at {wasm_path:#?}.");
+        self.wasm_path = Some(wasm_path);
         Ok(())
     }
 
@@ -435,6 +448,7 @@ impl Build {
     fn step_run_wasm_bindgen(&mut self) -> Result<()> {
         info!("Building the wasm bindings...");
         bindgen::wasm_bindgen_build(
+            self.wasm_path.as_ref().unwrap(),
             &self.crate_data,
             self.bindgen.as_ref().unwrap(),
             &self.out_dir,
@@ -444,7 +458,6 @@ impl Build {
             self.reference_types,
             self.target,
             self.profile.clone(),
-            &self.extra_options,
         )?;
         info!("wasm bindings were built at {:#?}.", &self.out_dir);
         Ok(())
