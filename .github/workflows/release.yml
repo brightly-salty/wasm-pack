@@ -4,6 +4,8 @@ on:
       - 'v*' # Run when tag matches v*, i.e. v1.0, v20.15.10
 
 name: Release
+permissions:
+  contents: read
 
 env:
   RELEASE_BIN: wasm-pack
@@ -112,6 +114,8 @@ jobs:
   release:
     name: GitHub Release
     needs: build
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Query version number
