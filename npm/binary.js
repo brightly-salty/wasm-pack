@@ -28,11 +28,11 @@ const getPlatform = () => {
 const getBinary = () => {
   const platform = getPlatform();
   const version = require("./package.json").version;
-  const author = "rustwasm";
+  const author = "drager";
   const name = "wasm-pack";
   const url = `https://github.com/${author}/${name}/releases/download/v${version}/${name}-v${version}-${platform}.tar.gz`;
   return new Binary(platform === windows ? "wasm-pack.exe" : "wasm-pack", url, {
-    installDirectory: join(__dirname, "binary")
+    installDirectory: join(__dirname, "binary"),
   });
 };
 
@@ -44,7 +44,7 @@ const install = () => {
 const run = () => {
   const binary = getBinary();
   binary.run();
-}
+};
 
 module.exports = {
   install,
