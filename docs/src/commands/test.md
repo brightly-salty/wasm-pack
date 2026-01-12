@@ -1,6 +1,6 @@
 # wasm-pack test
 
-The `wasm-pack test` command wraps the [wasm-bindgen-test-runner](https://rustwasm.github.io/wasm-bindgen/wasm-bindgen-test/index.html)
+The `wasm-pack test` command wraps the [wasm-bindgen-test-runner](https://wasm-bindgen.github.io/wasm-bindgen/wasm-bindgen-test)
 CLI allowing you to run wasm tests in different browsers without needing to install the different
 webdrivers yourself.
 

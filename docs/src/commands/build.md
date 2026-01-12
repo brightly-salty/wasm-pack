@@ -93,11 +93,11 @@ wasm-pack build --target nodejs
 | `no-modules` | [Native in browser][deploy-web] | Same as `web`, except the JS is included on a page and modifies global state, and doesn't support as many `wasm-bindgen` features as `web` |
 | `deno` | [Deno][deploy-deno] | Outputs JS that can be natively imported as an ES module in deno. |
 
-[deploy]: https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html
-[bundlers]: https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#bundlers
-[deploy-nodejs]: https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#nodejs
-[deploy-web]: https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#without-a-bundler
-[deploy-deno]: https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#deno
+[deploy]: https://wasm-bindgen.github.io/wasm-bindgen/reference/deployment.html
+[bundlers]: https://wasm-bindgen.github.io/wasm-bindgen/reference/deployment.html#bundlers
+[deploy-nodejs]: https://wasm-bindgen.github.io/wasm-bindgen/reference/deployment.html#nodejs
+[deploy-web]: https://wasm-bindgen.github.io/wasm-bindgen/reference/deployment.html#without-a-bundler
+[deploy-deno]: https://wasm-bindgen.github.io/wasm-bindgen/reference/deployment.html#deno
 
 ## Scope
 

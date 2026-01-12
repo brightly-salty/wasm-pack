@@ -144,7 +144,7 @@ impl Fixture {
                     # bindgen downloaded is what we expect, and if `=` is
                     # removed then it will download whatever the newest version
                     # of wasm-bindgen is which may not be what's listed here.
-                    wasm-bindgen = "=0.2.95"
+                    wasm-bindgen = "=0.2.100"
 
                     [dev-dependencies]
                     wasm-bindgen-test = "0.3"
@@ -182,7 +182,7 @@ impl Fixture {
                     # bindgen downloaded is what we expect, and if `=` is
                     # removed then it will download whatever the newest version
                     # of wasm-bindgen is which may not be what's listed here.
-                    wasm-bindgen = "=0.2.95"
+                    wasm-bindgen = "=0.2.100"
 
                     [dev-dependencies]
                     wasm-bindgen-test = "0.3"
@@ -220,7 +220,7 @@ impl Fixture {
                     crate-type = ["cdylib"]
 
                     [dependencies]
-                    wasm-bindgen = "=0.2.21"
+                    wasm-bindgen = "=0.2.100"
 
                     [dev-dependencies]
                     wasm-bindgen-test = "=0.2.21"
@@ -265,7 +265,7 @@ impl Fixture {
 
         static INSTALL_WASM_BINDGEN: Once = Once::new();
         let cache = self.cache();
-        let version = "0.2.95";
+        let version = "0.2.100";
 
         let download = || {
             if let Ok(download) =
@@ -390,8 +390,10 @@ impl Fixture {
     /// Get a `wasm-pack` command configured to run in this fixure's temp
     /// directory and using the test cache.
     pub fn wasm_pack(&self) -> Command {
-        use assert_cmd::prelude::*;
-        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
+        use assert_cmd::cargo;
+
+        let mut cmd = Command::new(cargo::cargo_bin!(env!("CARGO_PKG_NAME")));
+
         cmd.current_dir(&self.path);
         cmd.env("WASM_PACK_CACHE", self.cache_dir());
 

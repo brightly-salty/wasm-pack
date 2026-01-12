@@ -251,7 +251,7 @@ impl Test {
 
     fn step_check_for_wasm_target(&mut self) -> Result<()> {
         info!("Adding wasm-target...");
-        build::wasm_target::check_for_wasm32_target()?;
+        build::wasm_target::check_for_wasm_target("wasm32-unknown-unknown")?;
         info!("Adding wasm-target was successful.");
         Ok(())
     }

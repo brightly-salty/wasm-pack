@@ -8,12 +8,7 @@ browser or with Node.js. `wasm-pack` helps you build rust-generated
 WebAssembly packages that you could publish to the npm registry, or otherwise use
 alongside any javascript packages in workflows that you already use, such as [webpack].
 
-[bundler-support]: https://github.com/rustwasm/team/blob/master/goals/bundler-integration.md#details
 [webpack]: https://webpack.js.org/
 
-This project is a part of the [rust-wasm] group. You can find more info by
-visiting that repo!
-
-[rust-wasm]: https://github.com/rustwasm/team
 
 ![demo](https://github.com/drager/wasm-pack/raw/master/demo.gif)

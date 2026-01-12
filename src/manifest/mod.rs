@@ -17,7 +17,7 @@ use self::npm::{
 };
 use crate::command::build::{BuildProfile, Target};
 use crate::PBAR;
-use cargo_metadata::Metadata;
+use cargo_metadata::{CrateType, Metadata, TargetKind};
 use chrono::offset;
 use chrono::DateTime;
 use serde::{self, Deserialize};
@@ -429,7 +429,7 @@ struct NpmData {
 }
 
 #[doc(hidden)]
-pub struct ManifestAndUnsedKeys {
+pub struct ManifestAndUnusedKeys {
     pub manifest: CargoManifest,
     pub unused_keys: BTreeSet<String>,
 }
@@ -482,16 +482,21 @@ impl CrateData {
     }
 
     /// Read the `manifest_path` file and deserializes it using the toml Deserializer.
-    /// Returns a Result containing `ManifestAndUnsedKeys` which contains `CargoManifest`
+    /// Returns a Result containing `ManifestAndUnusedKeys` which contains `CargoManifest`
     /// and a `BTreeSet<String>` containing the unused keys from the parsed file.
     ///
     /// # Errors
     /// Will return Err if the file (manifest_path) couldn't be read or
     /// if deserialize to `CargoManifest` fails.
-    pub fn parse_crate_data(manifest_path: &Path) -> Result<ManifestAndUnsedKeys> {
+    pub fn parse_crate_data(manifest_path: &Path) -> Result<ManifestAndUnusedKeys> {
         let manifest = fs::read_to_string(&manifest_path)
             .with_context(|| anyhow!("failed to read: {}", manifest_path.display()))?;
-        let manifest = toml::Deserializer::new(&manifest);
+        let manifest = toml::Deserializer::parse(&manifest).with_context(|| {
+            anyhow!(
+                "failed to create TOML deserializer for: {}",
+                manifest_path.display()
+            )
+        })?;
 
         let mut unused_keys = BTreeSet::new();
         let levenshtein_threshold = 1;
@@ -508,7 +513,7 @@ impl CrateData {
         })
         .with_context(|| anyhow!("failed to parse manifest: {}", manifest_path.display()))?;
 
-        Ok(ManifestAndUnsedKeys {
+        Ok(ManifestAndUnusedKeys {
             manifest,
             unused_keys,
         })
@@ -516,7 +521,7 @@ impl CrateData {
 
     /// Iterating through all the passed `unused_keys` and output
     /// a warning for each unknown key.
-    pub fn warn_for_unused_keys(manifest_and_keys: &ManifestAndUnsedKeys) {
+    pub fn warn_for_unused_keys(manifest_and_keys: &ManifestAndUnusedKeys) {
         manifest_and_keys.unused_keys.iter().for_each(|path| {
             PBAR.warn(&format!(
                 "\"{}\" is an unknown key and will be ignored. Please check your Cargo.toml.",
@@ -546,8 +551,8 @@ impl CrateData {
         let any_cdylib = pkg
             .targets
             .iter()
-            .filter(|target| target.kind.iter().any(|k| k == "cdylib"))
-            .any(|target| target.crate_types.iter().any(|s| s == "cdylib"));
+            .filter(|target| target.kind.iter().any(|k| k == &TargetKind::CDyLib))
+            .any(|target| target.crate_types.iter().any(|s| s == &CrateType::CDyLib));
         if any_cdylib {
             return Ok(());
         }
@@ -569,7 +574,7 @@ impl CrateData {
         match pkg
             .targets
             .iter()
-            .find(|t| t.kind.iter().any(|k| k == "cdylib"))
+            .find(|t| t.kind.iter().any(|k| k == &TargetKind::CDyLib))
         {
             Some(lib) => lib.name.replace("-", "_"),
             None => pkg.name.replace("-", "_"),
@@ -672,7 +677,7 @@ impl CrateData {
         let pkg = &self.data.packages[self.current_idx];
         let npm_name = match scope {
             Some(s) => format!("@{}/{}", s, pkg.name),
-            None => pkg.name.clone(),
+            None => pkg.name.to_string(),
         };
 
         let dts_file = if !disable_dts {

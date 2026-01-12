@@ -309,6 +309,20 @@ fn it_creates_a_package_json_with_correct_keys_when_types_are_skipped() {
         "https://github.com/drager/wasm-pack.git"
     );
     assert_eq!(pkg.main, "js_hello_world.js");
+    assert_eq!(pkg.description, "so awesome rust+wasm package");
+    assert_eq!(pkg.license, "WTFPL");
+    assert_eq!(pkg.types, "");
+    assert_eq!(
+        pkg.side_effects,
+        vec!["./js_hello_world.js", "./snippets/*"]
+    );
+    assert_eq!(
+        pkg.keywords, None,
+        "keywords is not None: {:?}",
+        pkg.keywords,
+    );
+    assert_eq!(pkg.version, "0.1.0");
+    assert_eq!(pkg.module, "");
 
     let actual_files: HashSet<String> = pkg.files.into_iter().collect();
     let expected_files: HashSet<String> = [
