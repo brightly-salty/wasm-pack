@@ -2,6 +2,97 @@
 
 ## 🤍 Unreleased
 
+## 🌻 0.14.0
+
+- ### ✨ Features
+
+  - **Support arbitrary wasm targets (WASI support) - [RReverser], [pull/1524]**
+
+    Allows building for targets other than wasm32-unknown-unknown, enabling WASI and other custom wasm targets.
+
+    [pull/1524]: https://github.com/drager/wasm-pack/pull/1524
+    [RReverser]: https://github.com/RReverser
+
+  - **macOS ARM (aarch64-apple-darwin) build support - [kaleidawave], [pull/1529]**
+
+    Adds native Apple Silicon support in release builds and NPM package.
+
+    [pull/1529]: https://github.com/drager/wasm-pack/pull/1529
+    [kaleidawave]: https://github.com/kaleidawave
+
+  - **Allow `--split-linked-modules` flag for wasm-bindgen - [codeart1st], [pull/1443]**
+
+    [pull/1443]: https://github.com/drager/wasm-pack/pull/1443
+    [codeart1st]: https://github.com/codeart1st
+
+  - **Custom build profile support - [rafaelbeckel], [pull/1428]**
+
+    Allows using custom cargo profiles via `--profile`.
+
+    [pull/1428]: https://github.com/drager/wasm-pack/pull/1428
+    [rafaelbeckel]: https://github.com/rafaelbeckel
+
+- ### 🤕 Fixes
+
+  - **Fix NPM package download URL - [qinyuhang], [pull/1543]**
+
+    [pull/1543]: https://github.com/drager/wasm-pack/pull/1543
+    [qinyuhang]: https://github.com/qinyuhang
+
+  - **Filter build artifacts to only .wasm files - [drager], [pull/1535]**
+
+    [pull/1535]: https://github.com/drager/wasm-pack/pull/1535
+
+  - **Handle undefined VERSION in installer script - [BrianHung], [pull/1512]**
+
+    [pull/1512]: https://github.com/drager/wasm-pack/pull/1512
+    [BrianHung]: https://github.com/BrianHung
+
+  - **Fix it_gets_wasm_bindgen_version test - [mshroyer], [pull/1509]**
+
+    [pull/1509]: https://github.com/drager/wasm-pack/pull/1509
+    [mshroyer]: https://github.com/mshroyer
+
+- ### 🛠️ Maintenance
+
+  - **Update dependencies to latest versions - [drager], [pull/1536]**
+
+    [pull/1536]: https://github.com/drager/wasm-pack/pull/1536
+
+  - **Security workflow permissions fixes - [drager]**
+
+  - **Bump ring from 0.17.8 to 0.17.14 - [dependabot], [pull/1516]**
+
+    [pull/1516]: https://github.com/drager/wasm-pack/pull/1516
+
+  - **Bump brace-expansion from 1.1.11 to 1.1.12 in /npm - [dependabot], [pull/1515]**
+
+    [pull/1515]: https://github.com/drager/wasm-pack/pull/1515
+
+  - **Bump rustls from 0.23.16 to 0.23.18 - [dependabot], [pull/1451]**
+
+    [pull/1451]: https://github.com/drager/wasm-pack/pull/1451
+    [dependabot]: https://github.com/apps/dependabot
+
+  - **Fix tar vulnerability (CVE-2026-23745) in npm package**
+
+    Override tar dependency to ^7.5.3 to fix arbitrary file overwrite and symlink poisoning vulnerability ([GHSA-8qq5-rm4j-mr97]).
+
+    [GHSA-8qq5-rm4j-mr97]: https://github.com/advisories/GHSA-8qq5-rm4j-mr97
+
+  - **Fix axios vulnerabilities in npm package**
+
+    Override axios dependency to ^0.30.0 to fix SSRF/credential leakage via absolute URL and XSRF-TOKEN leakage (CSRF) vulnerabilities.
+
+- ### 📖 Documentation
+
+  - **Update documentation links to drager's repo - [yutannihilation], [pull/1513]**
+
+    [pull/1513]: https://github.com/drager/wasm-pack/pull/1513
+    [yutannihilation]: https://github.com/yutannihilation
+
+  - **Document prerequisites for webdriver tests - [mshroyer], [pull/1509]**
+
 ## ☀️ 0.13.1
 
 - ### ✨ Features
